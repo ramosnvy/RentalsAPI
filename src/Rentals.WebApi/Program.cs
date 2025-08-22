@@ -1,18 +1,45 @@
-using Serilog;
 using Microsoft.EntityFrameworkCore;
-using Rentals.Infrastructure; // seu DbContext vai estar aqui
+using Rentals.Infrastructure;
+using Rentals.Infrastructure.Repositories;
+using Rentals.Infrastructure;
+using Rentals.Application.Abstractions;
+using Rentals.Application.Commands;
+using Minio;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar Serilog
+// Serilog
 builder.Host.UseSerilog((ctx, lc) => lc
     .ReadFrom.Configuration(ctx.Configuration));
 
-// DbContext com Postgres
+// DbContext
 builder.Services.AddDbContext<RentalsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("RentalsDb")));
 
-// Add controllers + swagger
+// Repositories
+builder.Services.AddScoped<IDeliveryDriverRepository, DeliveryDriverRepository>();
+
+// MinIO client
+builder.Services.AddSingleton<IMinioClient>(sp =>
+{
+    var config = builder.Configuration.GetSection("Minio");
+    return new MinioClient()
+        .WithEndpoint(config["Endpoint"]!.Replace("http://", "").Replace("https://", ""))
+        .WithCredentials(config["AccessKey"], config["SecretKey"])
+        .WithSSL(config["Endpoint"]!.StartsWith("https"))
+        .Build();
+});
+
+
+// Storage service
+builder.Services.AddScoped<IStorageService, MinioStorageService>();
+
+// Handlers
+builder.Services.AddScoped<RegisterDeliveryDriverHandler>();
+builder.Services.AddScoped<UploadCnhImageDeliveryDriverHandler>();
+
+// Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,21 +50,13 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+// Migrations automáticas (opcional, dev only)
 using (var scope = app.Services.CreateScope())
 {
-    try
-    {
-        var context = scope.ServiceProvider.GetRequiredService<RentalsDbContext>();
-        await context.Database.MigrateAsync();
-        app.Logger.LogInformation("Database migrations applied successfully");
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogError(ex, "An error occurred while ensuring database is created");
-    }
+    var db = scope.ServiceProvider.GetRequiredService<RentalsDbContext>();
+    db.Database.Migrate();
 }
 
-// Middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -47,7 +66,5 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.MapControllers();
-
 app.MapHealthChecks("/health");
-
 app.Run();

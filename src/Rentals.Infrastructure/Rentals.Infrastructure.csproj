@@ -11,7 +11,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Minio" Version="6.0.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="RentalsDbContextFactory.cs">
+      <DependentUpon>RentalsDbContext.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,21 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Rentals.Domain.Drivers;
 
-namespace Rentals.Infrastructure
+namespace Rentals.Infrastructure;
+
+public class RentalsDbContext : DbContext
 {
-    public class RentalsDbContext : DbContext
+    public RentalsDbContext(DbContextOptions<RentalsDbContext> options)
+        : base(options)
     {
-        public RentalsDbContext(DbContextOptions<RentalsDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        // Exemplo: DbSets serão adicionados conforme as features
-        // public DbSet<Motorcycle> Motorcycles { get; set; }
+    public DbSet<DeliveryDriver> DeliveryDrivers { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            // Configurações de entidades irão aqui
-        }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Apply all configurations
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RentalsDbContext).Assembly);
     }
 }
