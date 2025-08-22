@@ -1,0 +1,18 @@
+{
+  "ConnectionStrings": {
+    "RentalsDb": "Host=localhost;Port=5432;Database=rentals;Username=postgres;Password=postgres",
+    "MongoDb": "mongodb://mongo:mongo@localhost:27017",
+    "RabbitMq": "amqp://guest:guest@localhost:5672",
+    "Minio": "http://localhost:9000"
+  },
+  "Minio": {
+    "AccessKey": "minio",
+    "SecretKey": "minio123",
+    "Bucket": "rentals-files"
+  },
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Debug"
+    }
+  }
+}

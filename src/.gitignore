@@ -1,0 +1,61 @@
+﻿# ---- Build ----
+bin/
+obj/
+out/
+artifacts/
+
+# ---- User-specific files ----
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ---- Rider / VS Code ----
+.idea/
+*.code-workspace
+
+# ---- Logs ----
+*.log
+logs/
+log/
+
+# ---- Docker ----
+postgres_data/
+rabbitmq_data/
+minio_data/
+mongo_data/
+**/docker-compose.override.yml
+
+# ---- EF Core ----
+*.dbmdl
+*.jfm
+Database.mdf
+Database.ldf
+
+# ---- Configs locais ----
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# ---- Test / Coverage ----
+*.coverage
+*.coveragexml
+TestResult*/
+TestResults/
+*.trx
+*.xml
+*.json
+
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ---- Others ----
+*.swp
+*.swo
+*.bak
+*.tmp
+*.old
