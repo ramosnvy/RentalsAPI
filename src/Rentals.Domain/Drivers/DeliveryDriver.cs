@@ -4,7 +4,7 @@ namespace Rentals.Domain.Drivers;
 
 public class DeliveryDriver : Entity
 {
-    public Guid Id { get; set; }
+    public long Id { get; set; }
     public string Identifier { get; private set; } = default!;
     public string Name { get; private set; } = default!;
     public Cnpj Cnpj { get; private set; } = default!;
@@ -33,7 +33,6 @@ public class DeliveryDriver : Entity
 
         return new DeliveryDriver
         {
-            Id = Guid.NewGuid(),
             Identifier = identifier,
             Name = name,
             Cnpj = cnpj,

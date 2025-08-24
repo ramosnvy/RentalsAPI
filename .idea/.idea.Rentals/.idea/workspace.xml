@@ -9,33 +9,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3269e087-7f7b-4781-a9fe-be93acc429cc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IDeliveryDriverRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IStorateService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverHandler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverHandler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/Cnh.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhCategory.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhImage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/Cnpj.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/RentalsDbContextFactory.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Repositories/DeliveryDriverRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Requests/RegisterDeliveryDriverRequest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Requests/UploadCnhImageRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Class1.cs" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IImageConverter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IJwtProvider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Auth/JwtProvider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Images/ImageConverter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/AuthDebugController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Rentals/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IDeliveryDriverRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Application/Abstractions/IDeliveryDriverRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Application/Rentals.Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Application/Rentals.Application.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhImage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/Cnpj.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/Cnpj.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/DeliveryDriver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Domain/Drivers/DeliveryDriver.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Migrations/RentalsDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Migrations/RentalsDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Configurations/DeliveryDriverConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Configurations/DeliveryDriverConfiguration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Migrations/20250822001436_InitialCreate.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Migrations/20250822001436_InitialCreate.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Migrations/RentalsDbContextModelSnapshot.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/MinioStorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Storage/MinioStorageService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Rentals.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Rentals.Infrastructure.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/RentalsDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/RentalsDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.Infrastructure/Repositories/DeliveryDriverRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.Infrastructure/Repositories/DeliveryDriverRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Rentals.WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rentals.WebApi/Rentals.WebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rentals.WebApi/Rentals.WebApi.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +64,8 @@
 }]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Abstractions/IDeliveryDriverRepository.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Abstractions/IImageConverter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Abstractions/IJwtProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Abstractions/IStorateService.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverCommand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Application/Commands/RegisterDeliveryDriverHandler.cs" root0="FORCE_HIGHLIGHTING" />
@@ -80,13 +79,19 @@
     <setting file="file://$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhImage.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Domain/Drivers/Cnpj.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Domain/Drivers/DeliveryDriver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/Auth/JwtProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/Configurations/DeliveryDriverConfiguration.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/MinioStorageService.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/Images/ImageConverter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/RentalsDbContextFactory.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/Repositories/DeliveryDriverRepository.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.Infrastructure/Storage/MinioStorageService.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/AuthDebugController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Requests/RegisterDeliveryDriverRequest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Requests/UploadCnhImageRequest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/294078ecfce6fdb942ecfee089f09717de7a6fcfe5efd9fdb6f4f93c0fb4813/ActionMethodExecutor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a6b1457cbcf17db31a383ba49ef9bcc786cf3ef77146d997eee499b27a46d/Object.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e096e6f12c5d6b49356bc34ff1ea08738f910c0929c9d717c9cba7f44288/EntityFrameworkQueryableExtensions.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
@@ -175,7 +180,7 @@
       <workItem from="1755810949050" duration="179000" />
       <workItem from="1755811166921" duration="2385000" />
       <workItem from="1755819609294" duration="1411000" />
-      <workItem from="1755821072127" duration="13640000" />
+      <workItem from="1755821072127" duration="30353000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -193,7 +198,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755826837789</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="DeliveryDriver Domain,Routes + infra">
+      <option name="closed" value="true" />
+      <created>1755838583497</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1755838583500</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,7 +238,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Init" />
-    <option name="LAST_COMMIT_MESSAGE" value="Init" />
+    <MESSAGE value="DeliveryDriver Domain,Routes + infra" />
+    <option name="LAST_COMMIT_MESSAGE" value="DeliveryDriver Domain,Routes + infra" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -242,6 +256,71 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs</url>
+          <line>31</line>
+          <properties documentPath="C:\RentalsAPI\src\Rentals.WebApi\Drivers\Controllers\DriversController.cs" containingFunctionPresentation="Method 'Register'">
+            <startOffsets>
+              <option value="1144" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1145" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Rentals.Application/Commands/UploadCnhImageDeliveryDriverHandler.cs</url>
+          <line>26</line>
+          <properties documentPath="C:\RentalsAPI\src\Rentals.Application\Commands\UploadCnhImageDeliveryDriverHandler.cs" containingFunctionPresentation="Method 'Handle'">
+            <startOffsets>
+              <option value="974" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1051" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs</url>
+          <line>63</line>
+          <properties documentPath="C:\RentalsAPI\src\Rentals.WebApi\Drivers\Controllers\DriversController.cs" containingFunctionPresentation="Method 'UploadCnhImage'">
+            <startOffsets>
+              <option value="2314" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2360" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Rentals.WebApi/Drivers/Controllers/DriversController.cs</url>
+          <line>60</line>
+          <properties documentPath="C:\RentalsAPI\src\Rentals.WebApi\Drivers\Controllers\DriversController.cs" containingFunctionPresentation="Method 'UploadCnhImage'">
+            <startOffsets>
+              <option value="2278" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2279" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Rentals.Domain/Drivers/CnhImage.cs</url>
+          <line>21</line>
+          <properties documentPath="C:\RentalsAPI\src\Rentals.Domain\Drivers\CnhImage.cs" containingFunctionPresentation="Method 'Create'">
+            <startOffsets>
+              <option value="485" />
+            </startOffsets>
+            <endOffsets>
+              <option value="525" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

@@ -12,6 +12,13 @@ public class DeliveryDriverConfiguration : IEntityTypeConfiguration<DeliveryDriv
 
         builder.HasKey(d => d.Id);
 
+        builder.Property(d => d.Id)
+            .ValueGeneratedOnAdd(); 
+
+        builder.Property(d => d.Identifier)
+            .IsRequired();
+
+        
         builder.Property(d => d.Identifier)
             .IsRequired()
             .HasMaxLength(100);
@@ -20,7 +27,6 @@ public class DeliveryDriverConfiguration : IEntityTypeConfiguration<DeliveryDriv
             .IsRequired()
             .HasMaxLength(200);
 
-        // Exemplo para Value Object Cnpj
         builder.OwnsOne(d => d.Cnpj, cnpj =>
         {
             cnpj.Property(c => c.Value)

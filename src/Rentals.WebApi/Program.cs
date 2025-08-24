@@ -1,11 +1,19 @@
+using System.Drawing;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Rentals.Infrastructure;
 using Rentals.Infrastructure.Repositories;
-using Rentals.Infrastructure;
+using Rentals.Infrastructure.Images;
 using Rentals.Application.Abstractions;
 using Rentals.Application.Commands;
 using Minio;
+using Rentals.Infrastructure.Auth;
 using Serilog;
+using ImageConverter = Rentals.Infrastructure.Images.ImageConverter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +39,6 @@ builder.Services.AddSingleton<IMinioClient>(sp =>
         .Build();
 });
 
-
 // Storage service
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
 
@@ -39,10 +46,103 @@ builder.Services.AddScoped<IStorageService, MinioStorageService>();
 builder.Services.AddScoped<RegisterDeliveryDriverHandler>();
 builder.Services.AddScoped<UploadCnhImageDeliveryDriverHandler>();
 
-// Controllers + Swagger
+// --- JWT ---
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // evita remapeamento automático
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
+            ),
+
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role, // garante role
+            NameClaimType = "identifier", // facilita pegar identifier
+            ClockSkew = TimeSpan.FromMinutes(2) // tolerância no tempo
+        };
+
+        // logs de debug em caso de erro
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = ctx =>
+            {
+                if (string.IsNullOrWhiteSpace(ctx.Token))
+                {
+                    var logger = ctx.HttpContext.RequestServices
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("JwtAuth");
+                    logger.LogWarning("No bearer token found in request.");
+                }
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = ctx =>
+            {
+                var logger = ctx.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+                logger.LogError(ctx.Exception, "JWT authentication failed.");
+                return Task.CompletedTask;
+            },
+            OnChallenge = ctx =>
+            {
+                var logger = ctx.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+                logger.LogWarning("JWT challenge: {Error} - {Description}", ctx.Error, ctx.ErrorDescription);
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IImageConverter, ImageConverter>();
+
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// --- Swagger ---
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Rentals API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,   // http (não ApiKey)
+        Scheme = "bearer",                // minúsculo
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer {your token}'"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // Health checks
 builder.Services.AddHealthChecks()
@@ -50,7 +150,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Migrations automáticas (opcional, dev only)
+// dev only
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<RentalsDbContext>();
@@ -65,6 +165,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 app.Run();

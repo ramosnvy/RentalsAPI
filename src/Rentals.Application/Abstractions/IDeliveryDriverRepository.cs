@@ -12,6 +12,8 @@ public interface IDeliveryDriverRepository
     
     Task<bool> ExistsByCnhNumberAsync(string cnhNumber);
     
-    Task<DeliveryDriver> GetByIdAsync(Guid id);
-
+    Task<DeliveryDriver> GetByIdAsync(long id);
+    
+    Task<DeliveryDriver> GetByIdentifierAsync(string identifier);
+    
 }

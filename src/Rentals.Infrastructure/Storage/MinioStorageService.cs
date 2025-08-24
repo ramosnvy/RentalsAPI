@@ -30,6 +30,7 @@ public class MinioStorageService : IStorageService
             .WithObject(fileName)
             .WithStreamData(stream)
             .WithObjectSize(stream.Length)
-            .WithContentType("image/png"));
+            .WithContentType("image/bmp"));
     }
+
 }

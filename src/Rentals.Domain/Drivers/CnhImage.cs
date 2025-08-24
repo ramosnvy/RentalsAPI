@@ -24,7 +24,7 @@ public sealed class CnhImage : ValueObject
             throw new ArgumentNullException("É obrigatório informar o caminho do arquivo.", nameof(blobPath));
         }
 
-        if (contentType is not ("image/png" or "image/bmp"))
+        if (contentType is not ("png" or "bmp"))
         {
             throw new ArgumentException("Formato inválido. Use PNG ou BMP.", nameof(contentType));
         }

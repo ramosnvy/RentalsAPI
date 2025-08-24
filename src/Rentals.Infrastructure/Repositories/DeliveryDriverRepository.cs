@@ -19,9 +19,14 @@ public class DeliveryDriverRepository : IDeliveryDriverRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<DeliveryDriver?> GetByIdAsync(Guid id)
+    public async Task<DeliveryDriver?> GetByIdAsync(long id)
         => await _context.DeliveryDrivers.FirstOrDefaultAsync(d => d.Id == id);
 
+    
+    public async Task<DeliveryDriver?> GetByIdentifierAsync(string identifier)
+        => await _context.DeliveryDrivers.FirstOrDefaultAsync(d => d.Identifier == identifier);
+
+    
     public async Task<bool> ExistsByCnpjAsync(string cnpj)
         => await _context.DeliveryDrivers.AnyAsync(d => d.Cnpj.Value == cnpj);
 
