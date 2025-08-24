@@ -1,6 +1,10 @@
 ﻿namespace Rentals.Domain.Abstractions;
 
-public abstract class Entity
+public abstract class Entity<TId>
 {
-    public Guid Id { get; protected set; } = Guid.NewGuid();
+    public TId Id { get; protected set; } = default!;
+}
+
+public abstract class Entity : Entity<long>
+{
 }

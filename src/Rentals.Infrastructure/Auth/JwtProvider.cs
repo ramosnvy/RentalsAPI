@@ -16,15 +16,16 @@ public class JwtProvider : IJwtProvider
         _configuration = configuration;
     }
 
-    public string GenerateToken(long id, string identifier, string role)
+    public string GenerateToken(string id, string identifier, string role)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        key.KeyId = "default-key"; // Adiciona um Key ID
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
-            new Claim("identifier", identifier),
+            new Claim(ClaimTypes.Name, identifier),
             new Claim(ClaimTypes.Role, role)
         };
         

@@ -11,18 +11,51 @@ namespace Rentals.WebApi.Drivers.Controllers;
 [Route("entregadores")]
 public class DriversController : ControllerBase
 {
-    private readonly RegisterDeliveryDriverHandler _registerDeliveryDriverHandler;
+    private readonly RegisterDeliveryDriverHandler _registerDriverHandler;
     private readonly UploadCnhImageDeliveryDriverHandler _uploadCnhImageDeliveryDriverHandler;
+    private readonly GetAllDeliveryDriversHandler _getAllDriversHandler;
     private readonly ILogger<DriversController> _logger;
 
     public DriversController(
-        RegisterDeliveryDriverHandler registerDeliveryDriverHandler,
+        RegisterDeliveryDriverHandler registerDriverHandler,
         UploadCnhImageDeliveryDriverHandler uploadCnhImageDeliveryDriverHandler,
+        GetAllDeliveryDriversHandler getAllDriversHandler,
         ILogger<DriversController> logger)
     {
-        _registerDeliveryDriverHandler = registerDeliveryDriverHandler;
+        _registerDriverHandler = registerDriverHandler;
         _uploadCnhImageDeliveryDriverHandler = uploadCnhImageDeliveryDriverHandler;
+        _getAllDriversHandler = getAllDriversHandler;
         _logger = logger;
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAll()
+    {
+        try
+        {
+            _logger.LogInformation("Fetching all delivery drivers");
+
+            var result = await _getAllDriversHandler.Handle();
+
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            _logger.LogInformation("Successfully fetched {Count} delivery drivers", result.TotalCount);
+
+            return Ok(new
+            {
+                drivers = result.Drivers,
+                totalCount = result.TotalCount
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Erro ao buscar entregadores");
+            return StatusCode(500, new { message = "Erro interno do servidor ao buscar entregadores." });
+        }
     }
 
     [HttpPost]
@@ -30,62 +63,78 @@ public class DriversController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Starting registration for driver {Identifier}", request.Identificador);
+            _logger.LogInformation("Starting registration for driver {Identifier}", request.Identifier);
 
-            var command = new RegisterDeliveryDriverCommand(
-                Identifier: request.Identificador,
-                Name: request.Nome,
-                Cnpj: request.Cnpj,
-                BirthDate: request.Data_Nascimento,
-                CnhNumber: request.Numero_Cnh,
-                CnhCategory: request.Tipo_Cnh,
-                CnhImageBase64: request.Imagem_Cnh
+            var result = await _registerDriverHandler.Handle(
+                request.Identifier,
+                request.Email,
+                request.Password,
+                request.Nome,
+                request.Cnpj,
+                request.Data_Nascimento,
+                request.Numero_Cnh,
+                request.Tipo_Cnh,
+                request.Imagem_Cnh
             );
 
-            var token = await _registerDeliveryDriverHandler.Handle(command);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.ErrorMessage });
+            }
 
-            _logger.LogInformation("Driver {Identifier} successfully registered", request.Identificador);
+            _logger.LogInformation("Driver {Identifier} successfully registered", request.Identifier);
 
-            return Ok(new { token });
+            return CreatedAtAction(nameof(Register), new { id = result.UserId }, new
+            {
+                id = result.UserId,
+                token = result.Token
+            });
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while registering driver {Identifier}", request.Identificador);
-            return BadRequest(new { message = "Invalid data." });
+            _logger.LogError(e, "Erro ao registrar entregador {Identifier}", request.Identifier);
+            return BadRequest(new { message = "Dados inválidos para registro." });
         }
     }
 
-    [Authorize(Roles = "Driver")]
-    [HttpPost("{id}/cnh")]
-    public async Task<IActionResult> UploadCnhImage(long id, [FromBody] UploadCnhImageRequest request)
+    [Authorize(Roles = "DeliveryDriver")]
+    [HttpPost("{userId}/cnh")]
+    public async Task<IActionResult> UploadCnhImage(long userId, [FromBody] UploadCnhImageRequest request)
     {
         try
         {
-            var jwtIdentifier = User.FindFirstValue("id");
+            _logger.LogInformation("Upload CNH request received for user {UserId}", userId);
+            
+            // Log all claims for debugging
+            var claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+            _logger.LogInformation("JWT Claims: {Claims}", string.Join(", ", claims));
+            
+            var jwtIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _logger.LogInformation("JWT Identifier from NameIdentifier claim: {JwtIdentifier}", jwtIdentifier);
 
-            if (jwtIdentifier != id.ToString())
+            if (jwtIdentifier != userId.ToString())
             {
-                _logger.LogWarning("Unauthorized CNH upload attempt. Token identifier={JwtIdentifier}, Route identifier={RouteIdentifier}", jwtIdentifier, id.ToString());
+                _logger.LogWarning("Unauthorized CNH upload attempt. Token identifier={JwtIdentifier}, Route identifier={RouteIdentifier}", jwtIdentifier, userId.ToString());
                 return Forbid();
             }
 
-            _logger.LogInformation("Starting CNH upload for driver {Identifier}", id.ToString());
+            _logger.LogInformation("Starting CNH upload for user {UserId}", userId.ToString());
 
             var command = new UploadCnhImageDeliveryDriverCommand(
-                Id: id,
+                Id: userId,
                 CnhImageBase64: request.Imagem_Cnh
             );
 
             await _uploadCnhImageDeliveryDriverHandler.Handle(command);
 
-            _logger.LogInformation("CNH upload completed successfully for driver {Identifier}", id.ToString());
+            _logger.LogInformation("CNH upload completed successfully for user {UserId}", userId.ToString());
 
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while uploading CNH for driver {Identifier}", id.ToString());
-            return BadRequest(new { error = ex.Message });
+            _logger.LogError(ex, "Erro ao fazer upload da CNH para o usuário {UserId}", userId.ToString());
+            return BadRequest(new { error = "Erro interno ao processar upload da CNH." });
         }
     }
 }

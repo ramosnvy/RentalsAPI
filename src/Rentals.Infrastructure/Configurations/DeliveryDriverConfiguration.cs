@@ -2,26 +2,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Rentals.Domain.Drivers;
 
-namespace Rentals.Infrastructure;
+namespace Rentals.Infrastructure.Configurations;
 
 public class DeliveryDriverConfiguration : IEntityTypeConfiguration<DeliveryDriver>
 {
     public void Configure(EntityTypeBuilder<DeliveryDriver> builder)
     {
-        builder.ToTable("delivery_drivers");
+        builder.ToTable("user_driver");
 
         builder.HasKey(d => d.Id);
 
         builder.Property(d => d.Id)
             .ValueGeneratedOnAdd(); 
 
-        builder.Property(d => d.Identifier)
-            .IsRequired();
 
-        
-        builder.Property(d => d.Identifier)
-            .IsRequired()
-            .HasMaxLength(100);
 
         builder.Property(d => d.Name)
             .IsRequired()

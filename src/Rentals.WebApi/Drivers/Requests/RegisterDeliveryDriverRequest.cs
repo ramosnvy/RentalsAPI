@@ -2,7 +2,9 @@ namespace Rentals.WebApi.Drivers.Requests;
 
 public class RegisterDeliveryDriverRequest
 {
-    public string Identificador { get; set; } = default!;
+    public string Identifier { get; set; } = default!;
+    public string Email { get; set; } = default!;
+    public string Password { get; set; } = default!;
     public string Nome  { get; set; } = default!;
     public string Cnpj  { get; set; } = default!;
     public DateTime Data_Nascimento { get; set; }

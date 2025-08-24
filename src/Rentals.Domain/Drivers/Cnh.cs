@@ -25,7 +25,8 @@ public sealed class Cnh : ValueObject
             "A" => Drivers.CnhCategory.A,
             "B" => Drivers.CnhCategory.B,
             "AB" => Drivers.CnhCategory.AB,
-            _ => throw new ArgumentException("Tipo de CNH inválido. Use A, B ou A+B", nameof(type))
+            "A+B" => Drivers.CnhCategory.AB,
+            _ => throw new ArgumentException("Tipo de CNH inválido. Use A, B, AB ou A+B", nameof(type))
         };
 
         return new Cnh(number.Trim(), category);

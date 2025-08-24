@@ -27,6 +27,7 @@ builder.Services.AddDbContext<RentalsDbContext>(options =>
 
 // Repositories
 builder.Services.AddScoped<IDeliveryDriverRepository, DeliveryDriverRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // MinIO client
 builder.Services.AddSingleton<IMinioClient>(sp =>
@@ -45,6 +46,9 @@ builder.Services.AddScoped<IStorageService, MinioStorageService>();
 // Handlers
 builder.Services.AddScoped<RegisterDeliveryDriverHandler>();
 builder.Services.AddScoped<UploadCnhImageDeliveryDriverHandler>();
+builder.Services.AddScoped<GetAllDeliveryDriversHandler>();
+builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<RegisterAdminHandler>();
 
 // --- JWT ---
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // evita remapeamento automático
@@ -55,6 +59,9 @@ builder.Services
     {
         var jwtSettings = builder.Configuration.GetSection("Jwt");
 
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+        signingKey.KeyId = "default-key"; // Mesmo Key ID usado na geração
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -64,12 +71,10 @@ builder.Services
 
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
-            ),
+            IssuerSigningKeys = new List<SecurityKey> { signingKey }, // Usar IssuerSigningKeys em vez de IssuerSigningKey
 
             RoleClaimType = System.Security.Claims.ClaimTypes.Role, // garante role
-            NameClaimType = "identifier", // facilita pegar identifier
+            NameClaimType = System.Security.Claims.ClaimTypes.Name, // facilita pegar username
             ClockSkew = TimeSpan.FromMinutes(2) // tolerância no tempo
         };
 
@@ -107,6 +112,7 @@ builder.Services
     });
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IImageConverter, ImageConverter>();
 
 builder.Services.AddAuthorization();

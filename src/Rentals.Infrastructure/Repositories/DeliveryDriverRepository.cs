@@ -22,11 +22,6 @@ public class DeliveryDriverRepository : IDeliveryDriverRepository
     public async Task<DeliveryDriver?> GetByIdAsync(long id)
         => await _context.DeliveryDrivers.FirstOrDefaultAsync(d => d.Id == id);
 
-    
-    public async Task<DeliveryDriver?> GetByIdentifierAsync(string identifier)
-        => await _context.DeliveryDrivers.FirstOrDefaultAsync(d => d.Identifier == identifier);
-
-    
     public async Task<bool> ExistsByCnpjAsync(string cnpj)
         => await _context.DeliveryDrivers.AnyAsync(d => d.Cnpj.Value == cnpj);
 
@@ -38,4 +33,10 @@ public class DeliveryDriverRepository : IDeliveryDriverRepository
         _context.DeliveryDrivers.Update(driver);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<DeliveryDriver>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _context.DeliveryDrivers
+            .Include("Cnh")
+            .Include("CnhImage")
+            .ToListAsync(cancellationToken);
 }
