@@ -518,32 +518,6 @@ docker-compose logs -f mongo
 
 ---
 
-## 🚀 Deploy
-
-### **Ambiente de Produção**
-
-Para deploy em produção, considere:
-
-1. **Variáveis de Ambiente**: Configure todas as strings de conexão
-2. **SSL/TLS**: Configure certificados HTTPS
-3. **Logging**: Configure logging estruturado
-4. **Monitoramento**: Implemente health checks
-5. **Backup**: Configure backup dos bancos de dados
-
-### **Docker Production**
-
-```bash
-# Build da imagem
-docker build -t rentals-api .
-
-# Executar em produção
-docker run -d -p 5000:5000 --name rentals-api rentals-api
-```
-
----
-
-## 🤝 Contribuição
-
 ### **Padrões de Código**
 
 - Siga os princípios **SOLID**
@@ -552,45 +526,9 @@ docker run -d -p 5000:5000 --name rentals-api rentals-api
 - Escreva código limpo e legível
 - Documente APIs e interfaces
 
-### **Processo de Contribuição**
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
----
 
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
-
-## 📞 Suporte
-
-Para dúvidas ou suporte:
-
-- **Issues**: Abra uma issue no GitHub
-- **Documentação**: Consulte a documentação da API via Swagger
-- **Relatório**: Veja o `RELATORIO_SOLID_CLEAN_ARCHITECTURE.md` para análise detalhada
-
----
-
-## 🎯 Status do Projeto
-
-- ✅ **Clean Architecture** implementada
-- ✅ **SOLID Principles** aplicados
-- ✅ **Domain-Driven Design** implementado
-- ✅ **Multi-database** configurado
-- ✅ **Message Broker** integrado
-- ✅ **Object Storage** configurado
-- ✅ **Autenticação JWT** implementada
-- ✅ **Documentação** completa
-
-**Nota Geral: 8.6/10** ⭐⭐⭐⭐⭐
-
----
-
-*Desenvolvido com ❤️ seguindo as melhores práticas de arquitetura de software.*
