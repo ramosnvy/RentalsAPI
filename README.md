@@ -2,15 +2,6 @@
 
 Sistema de gerenciamento de locação de motocicletas desenvolvido com **Clean Architecture** e **Domain-Driven Design (DDD)**, seguindo os princípios **SOLID**.
 
-## 📋 Índice
-
-- [Configuração](#configuração)
-- [Uso](#uso)
-- [API Endpoints](#api-endpoints)
-- [Serviços Externos](#serviços-externos)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Contribuição](#contribuição)
-
 ---
 
 ## 🎯 Visão Geral
