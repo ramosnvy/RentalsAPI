@@ -177,7 +177,7 @@ dotnet ef database update --project src/Rentals.Infrastructure --startup-project
 
 ```bash
 # Executar a API
-dotnet run --project src/Rentals.WebApi/Rentals.WebApi.csproj
+dotnet run --project src/Rentals.WebApi --urls "http://localhost:5000"
 ```
 
 ---
@@ -186,11 +186,8 @@ dotnet run --project src/Rentals.WebApi/Rentals.WebApi.csproj
 
 ### **Arquivos de Configuração**
 
-O projeto utiliza múltiplos arquivos de configuração:
-
-- `appsettings.json` - Configuração base
+- `appsettings.json` - Configuração base (Estou enviando para evitar a necessidade de configurar.)
 - `appsettings.Development.json` - Configuração de desenvolvimento
-- `appsettings.example.json` - Exemplo de configuração
 
 ### **Variáveis de Ambiente**
 
@@ -517,15 +514,6 @@ docker-compose logs -f mongo
 ```
 
 ---
-
-### **Padrões de Código**
-
-- Siga os princípios **SOLID**
-- Mantenha a **Clean Architecture**
-- Use **Domain-Driven Design**
-- Escreva código limpo e legível
-- Documente APIs e interfaces
-
 
 ## 📄 Licença
 
