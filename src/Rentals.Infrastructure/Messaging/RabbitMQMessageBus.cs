@@ -17,46 +17,84 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
     private readonly IConfiguration _configuration;
     private readonly object _lock = new object();
     private bool _disposed = false;
+    private readonly SemaphoreSlim _connectionSemaphore = new SemaphoreSlim(1, 1);
+    private Task? _connectionTask;
 
     public RabbitMQMessageBus(ILogger<RabbitMQMessageBus> logger, IConfiguration configuration)
     {
         _logger = logger;
         _configuration = configuration;
         
-        // Tentar conectar de forma assíncrona para não bloquear a inicialização
-        _ = Task.Run(() => TryConnectAsync());
+        // Iniciar tentativa de conexão em background
+        _connectionTask = Task.Run(() => TryConnectWithRetryAsync());
     }
 
-    private async Task TryConnectAsync()
+    private async Task TryConnectWithRetryAsync()
     {
-        try
+        const int maxRetries = 10;
+        const int delaySeconds = 3;
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
-            await Task.Delay(2000); // Aguardar um pouco para os serviços ficarem prontos
-            
-            var rabbitMqConfig = _configuration.GetSection("RabbitMQ");
-            var factory = new ConnectionFactory
+            try
             {
-                HostName = rabbitMqConfig["HostName"] ?? "localhost",
-                UserName = rabbitMqConfig["UserName"] ?? "guest",
-                Password = rabbitMqConfig["Password"] ?? "guest",
-                VirtualHost = rabbitMqConfig["VirtualHost"] ?? "/",
-                RequestedConnectionTimeout = TimeSpan.FromSeconds(5),
-                SocketReadTimeout = TimeSpan.FromSeconds(5)
-            };
+                _logger.LogInformation("Tentativa {Attempt}/{MaxRetries} de conexão com RabbitMQ...", attempt, maxRetries);
+                
+                var rabbitMqConfig = _configuration.GetSection("RabbitMQ");
+                var factory = new ConnectionFactory
+                {
+                    HostName = rabbitMqConfig["HostName"] ?? "localhost",
+                    UserName = rabbitMqConfig["UserName"] ?? "guest",
+                    Password = rabbitMqConfig["Password"] ?? "guest",
+                    VirtualHost = rabbitMqConfig["VirtualHost"] ?? "/",
+                    RequestedConnectionTimeout = TimeSpan.FromSeconds(10),
+                    SocketReadTimeout = TimeSpan.FromSeconds(10)
+                };
 
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            
-            _logger.LogInformation("Conexão com RabbitMQ estabelecida com sucesso");
+                _connection = factory.CreateConnection();
+                _channel = _connection.CreateModel();
+                
+                _logger.LogInformation("Conexão com RabbitMQ estabelecida com sucesso na tentativa {Attempt}", attempt);
+                return;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Tentativa {Attempt}/{MaxRetries} falhou. Aguardando {Delay} segundos antes da próxima tentativa...", attempt, maxRetries, delaySeconds);
+                
+                if (attempt < maxRetries)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+                }
+                else
+                {
+                    _logger.LogError(ex, "Todas as {MaxRetries} tentativas de conexão com RabbitMQ falharam. A aplicação continuará funcionando sem mensageria.", maxRetries);
+                }
+            }
         }
-        catch (Exception ex)
+    }
+
+    public async Task WaitForConnectionAsync(TimeSpan timeout = default)
+    {
+        if (timeout == default)
+            timeout = TimeSpan.FromMinutes(2);
+
+        if (_connectionTask != null)
         {
-            _logger.LogWarning(ex, "Não foi possível conectar ao RabbitMQ. A aplicação continuará funcionando sem mensageria.");
+            try
+            {
+                await _connectionTask.WaitAsync(timeout);
+            }
+            catch (TimeoutException)
+            {
+                _logger.LogWarning("Timeout aguardando conexão com RabbitMQ. Continuando sem mensageria.");
+            }
         }
     }
 
     public async Task PublishAsync<T>(T message, string queue, CancellationToken cancellationToken = default) where T : class
     {
+        await WaitForConnectionAsync();
+        
         if (_channel == null || _connection == null || !_connection.IsOpen)
         {
             _logger.LogWarning("RabbitMQ não está disponível. Mensagem não será publicada na fila {Queue}", queue);
@@ -65,16 +103,22 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
 
         try
         {
-            _channel.QueueDeclare(queue, durable: true, exclusive: false, autoDelete: false);
+            lock (_lock)
+            {
+                _channel.QueueDeclare(queue, durable: true, exclusive: false, autoDelete: false);
+            }
 
             var json = JsonConvert.SerializeObject(message);
             var body = Encoding.UTF8.GetBytes(json);
 
-            _channel.BasicPublish(
-                exchange: "",
-                routingKey: queue,
-                basicProperties: null,
-                body: body);
+            lock (_lock)
+            {
+                _channel.BasicPublish(
+                    exchange: "",
+                    routingKey: queue,
+                    basicProperties: null,
+                    body: body);
+            }
 
             _logger.LogInformation("Mensagem publicada na fila {Queue}: {Message}", queue, json);
         }
@@ -87,6 +131,8 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
 
     public async Task SubscribeAsync<T>(string queue, Func<T, Task> handler, CancellationToken cancellationToken = default) where T : class
     {
+        await WaitForConnectionAsync();
+        
         if (_channel == null || _connection == null || !_connection.IsOpen)
         {
             _logger.LogWarning("RabbitMQ não está disponível. Consumidor não será configurado para a fila {Queue}", queue);
@@ -95,7 +141,10 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
 
         try
         {
-            _channel.QueueDeclare(queue, durable: true, exclusive: false, autoDelete: false);
+            lock (_lock)
+            {
+                _channel.QueueDeclare(queue, durable: true, exclusive: false, autoDelete: false);
+            }
 
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (model, ea) =>
@@ -109,20 +158,32 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
                     if (deserializedMessage != null)
                     {
                         await handler(deserializedMessage);
-                        _channel.BasicAck(ea.DeliveryTag, false);
+                        
+                        lock (_lock)
+                        {
+                            _channel.BasicAck(ea.DeliveryTag, false);
+                        }
+                        
                         _logger.LogInformation("Mensagem processada com sucesso da fila {Queue}", queue);
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Erro ao processar mensagem da fila {Queue}", queue);
-                    _channel.BasicNack(ea.DeliveryTag, false, true);
+                    
+                    lock (_lock)
+                    {
+                        _channel.BasicNack(ea.DeliveryTag, false, true);
+                    }
                 }
             };
 
-            _channel.BasicConsume(queue: queue,
-                                 autoAck: false,
-                                 consumer: consumer);
+            lock (_lock)
+            {
+                _channel.BasicConsume(queue: queue,
+                                     autoAck: false,
+                                     consumer: consumer);
+            }
 
             _logger.LogInformation("Consumidor iniciado para a fila {Queue}", queue);
         }
@@ -137,6 +198,7 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
     {
         if (_disposed) return;
         
+        _connectionSemaphore?.Dispose();
         _channel?.Dispose();
         _connection?.Dispose();
         _disposed = true;

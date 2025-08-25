@@ -222,6 +222,12 @@ using (var scope = app.Services.CreateScope())
     var messageBus = scope.ServiceProvider.GetRequiredService<Rentals.Application.Abstractions.IMessageBus>();
     var notificationHandler = scope.ServiceProvider.GetRequiredService<Rentals.Application.Commands.Motorcycle2024NotificationHandler>();
 
+    // Aguardar conexão com RabbitMQ antes de configurar o consumidor
+    if (messageBus is Rentals.Infrastructure.Messaging.RabbitMQMessageBus rabbitMqBus)
+    {
+        await rabbitMqBus.WaitForConnectionAsync(TimeSpan.FromMinutes(2));
+    }
+
     await messageBus.SubscribeAsync<Rentals.Application.Commands.MotorcycleCreatedMessage>(
         "motorcycle.created",
         async message => await notificationHandler.Handle(message));
