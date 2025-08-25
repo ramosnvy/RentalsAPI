@@ -433,7 +433,6 @@ RentalsAPI/
 │   │   ├── Entities/                  # Entidades de infraestrutura
 │   │   ├── Images/                    # Processamento de imagens
 │   │   ├── Messaging/                 # Integração RabbitMQ
-│   │   ├── Migrations/                # Migrações do banco
 │   │   ├── MongoDB/                   # Integração MongoDB
 │   │   ├── Repositories/              # Implementações de repositórios
 │   │   └── Storage/                   # Integração MinIO
@@ -448,7 +447,6 @@ RentalsAPI/
 │
 ├── README.md                         # Este arquivo
 ├── Rentals.sln                       # Solution file
-└── RELATORIO_SOLID_CLEAN_ARCHITECTURE.md  # Relatório de análise
 ```
 
 ---
