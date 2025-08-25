@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +10,8 @@ using Rentals.Infrastructure.Images;
 using Rentals.Application.Abstractions;
 using Rentals.Application.Commands;
 using Minio;
+using MongoDB.Driver;
+using Rentals.Application.Queries;
 using Rentals.Infrastructure.Auth;
 using Serilog;
 using ImageConverter = Rentals.Infrastructure.Images.ImageConverter;
@@ -49,6 +50,20 @@ builder.Services.AddScoped<UploadCnhImageDeliveryDriverHandler>();
 builder.Services.AddScoped<GetAllDeliveryDriversHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterAdminHandler>();
+builder.Services.AddScoped<RegisterMotorcycleHandler>();
+builder.Services.AddScoped<GetAllMotorcyclesHandler>();
+builder.Services.AddScoped<GetMotorcycleByIdHandler>();
+builder.Services.AddScoped<GetMotorcycles2024Handler>();
+builder.Services.AddScoped<UpdateMotorcycleLicensePlateHandler>();
+builder.Services.AddScoped<DeleteMotorcycleHandler>();
+builder.Services.AddScoped<Motorcycle2024NotificationHandler>();
+
+// Rental Handlers
+builder.Services.AddScoped<CreateRentalPlanHandler>();
+builder.Services.AddScoped<GetAllRentalPlansHandler>();
+builder.Services.AddScoped<CreateRentalHandler>();
+builder.Services.AddScoped<GetRentalByIdHandler>();
+builder.Services.AddScoped<ReturnRentalHandler>();
 
 // --- JWT ---
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // evita remapeamento automático
@@ -115,6 +130,27 @@ builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IImageConverter, ImageConverter>();
 
+// MongoDB
+builder.Services.Configure<Rentals.Infrastructure.MongoDB.MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDB"));
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = builder.Configuration.GetSection("MongoDB").Get<Rentals.Infrastructure.MongoDB.MongoDbSettings>();
+    return new MongoDB.Driver.MongoClient(settings?.ConnectionString ?? "mongodb://localhost:27017");
+});
+
+// Repositories
+builder.Services.AddScoped<Rentals.Application.Abstractions.IMotorcycleRepository, Rentals.Infrastructure.Repositories.MotorcycleRepository>();
+builder.Services.AddScoped<Rentals.Application.Abstractions.IMotorcycleNotificationRepository, Rentals.Infrastructure.MongoDB.Repositories.MongoMotorcycleNotificationRepository>();
+builder.Services.AddScoped<Rentals.Application.Abstractions.IRentalPlanRepository, Rentals.Infrastructure.Repositories.RentalPlanRepository>();
+builder.Services.AddScoped<Rentals.Application.Abstractions.IRentalRepository, Rentals.Infrastructure.Repositories.RentalRepository>();
+
+// Services
+builder.Services.AddScoped<Rentals.Application.Services.IRentalCalculationService, Rentals.Application.Services.RentalCalculationService>();
+
+// Message Bus - Registrado como Singleton para ser opcional
+builder.Services.AddSingleton<Rentals.Application.Abstractions.IMessageBus, Rentals.Infrastructure.Messaging.RabbitMQMessageBus>();
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -152,7 +188,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Health checks
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("RentalsDb"));
+    .AddNpgSql(builder.Configuration.GetConnectionString("RentalsDb") ?? "Host=localhost;Database=rentals;Username=postgres;Password=postgres");
 
 var app = builder.Build();
 
@@ -161,6 +197,10 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<RentalsDbContext>();
     db.Database.Migrate();
+    
+    // Inicializar planos padrão
+    var calculationService = scope.ServiceProvider.GetRequiredService<Rentals.Application.Services.IRentalCalculationService>();
+    await calculationService.InitializeDefaultPlans();
 }
 
 if (app.Environment.IsDevelopment())
@@ -175,4 +215,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+
+// Configurar consumer para motos de 2024
+using (var scope = app.Services.CreateScope())
+{
+    var messageBus = scope.ServiceProvider.GetRequiredService<Rentals.Application.Abstractions.IMessageBus>();
+    var notificationHandler = scope.ServiceProvider.GetRequiredService<Rentals.Application.Commands.Motorcycle2024NotificationHandler>();
+
+    await messageBus.SubscribeAsync<Rentals.Application.Commands.MotorcycleCreatedMessage>(
+        "motorcycle.created",
+        async message => await notificationHandler.Handle(message));
+}
+
 app.Run();

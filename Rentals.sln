@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rentals.Infrastructure", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rentals.WebApi", "src\Rentals.WebApi\Rentals.WebApi.csproj", "{26FAA2E0-298F-450B-8631-A90C5FECBD95}"
 EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
