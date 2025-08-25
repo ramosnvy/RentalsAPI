@@ -4,11 +4,6 @@ Sistema de gerenciamento de locação de motocicletas desenvolvido com **Clean A
 
 ## 📋 Índice
 
-- [Visão Geral](#visão-geral)
-- [Arquitetura](#arquitetura)
-- [Tecnologias](#tecnologias)
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
 - [Configuração](#configuração)
 - [Uso](#uso)
 - [API Endpoints](#api-endpoints)
